@@ -537,13 +537,15 @@
   
     if (self.panFromEdge && [gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]] && !self.visible) {
         CGPoint point = [touch locationInView:gestureRecognizer.view];
-        if (point.x < 20.0 || point.x > self.view.frame.size.width - 20.0) {
+        int intereactLength = CGRectGetWidth(self.view.bounds)*0.3;
+        if (point.x < intereactLength && self.leftMenuViewController) {
             return YES;
-        } else {
-            return NO;
         }
+        if (point.x > ( CGRectGetWidth(self.view.bounds) - intereactLength) && self.rightMenuViewController) {
+            return YES;
+        }
+        return NO;
     }
-    
     return YES;
 }
 
