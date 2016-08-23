@@ -526,14 +526,27 @@
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
-    IF_IOS7_OR_GREATER(
-       if (self.interactivePopGestureRecognizerEnabled && [self.contentViewController isKindOfClass:[UINavigationController class]]) {
-           UINavigationController *navigationController = (UINavigationController *)self.contentViewController;
-           if (navigationController.viewControllers.count > 1 && navigationController.interactivePopGestureRecognizer.enabled) {
-               return NO;
+    if (kCFCoreFoundationVersionNumber > kCFCoreFoundationVersionNumber_iOS_6_1) {
+       if (self.interactivePopGestureRecognizerEnabled ) {
+           if ([self.contentViewController isKindOfClass:[UINavigationController class]]) {
+               UINavigationController *navigationController = (UINavigationController *)self.contentViewController;
+               if (navigationController.viewControllers.count > 1 && navigationController.interactivePopGestureRecognizer.enabled) {
+                   return NO;
+               }
            }
+           if ([self.contentViewController isKindOfClass:[UITabBarController class]]) {
+               UITabBarController* tabController = (UITabBarController*)self.contentViewController;
+               UIViewController* selectVC = tabController.selectedViewController;
+               if ([selectVC isKindOfClass:[UINavigationController class]]) {
+                   UINavigationController *navigationController = (UINavigationController *)selectVC;
+                   if (navigationController.viewControllers.count > 1 && navigationController.interactivePopGestureRecognizer.enabled) {
+                       return NO;
+                   }
+               }
+           }
+           
        }
-    );
+    }
   
     if (self.panFromEdge && [gestureRecognizer isKindOfClass:[UIPanGestureRecognizer class]] && !self.visible) {
         CGPoint point = [touch locationInView:gestureRecognizer.view];
