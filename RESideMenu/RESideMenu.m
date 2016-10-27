@@ -644,6 +644,7 @@
         } else {
             point.x = MIN(point.x, [UIScreen mainScreen].bounds.size.height);
         }
+        
         [recognizer setTranslation:point inView:self.view];
         
         if (!self.didNotifyDelegate) {
@@ -666,13 +667,18 @@
             self.contentViewContainer.transform = CGAffineTransformTranslate(self.contentViewContainer.transform, point.x, 0);
         } else {
             self.contentViewContainer.transform = CGAffineTransformMakeScale(contentViewScale, contentViewScale);
-            self.contentViewContainer.transform = CGAffineTransformTranslate(self.contentViewContainer.transform, point.x, 0);
+            //此处只适配了左侧Menu右侧没有处理，可能会有坑，切记
+            if (point.x <= CGRectGetMidX(self.view.bounds) + self.contentViewInPortraitOffsetCenterX) {
+                self.contentViewContainer.transform = CGAffineTransformTranslate(self.contentViewContainer.transform, point.x, 0);
+            } else {
+                self.contentViewContainer.transform = CGAffineTransformTranslate(self.contentViewContainer.transform, CGRectGetMidX(self.view.bounds) + self.contentViewInPortraitOffsetCenterX, 0);
+            }
         }
         
         self.leftMenuViewController.view.hidden = self.contentViewContainer.frame.origin.x < 0;
         self.rightMenuViewController.view.hidden = self.contentViewContainer.frame.origin.x > 0;
         
-        if (!self.leftMenuViewController && self.contentViewContainer.frame.origin.x > 0) {
+        if (!self.leftMenuViewController && self.contentViewContainer.frame.origin.x > 0 ) {
             self.contentViewContainer.transform = CGAffineTransformIdentity;
             self.contentViewContainer.frame = self.view.bounds;
             self.visible = NO;
